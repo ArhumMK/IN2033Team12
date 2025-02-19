@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.Map;
+
 public interface MarketingBoxOfficeInterface {
 
     /**
@@ -55,15 +58,15 @@ public interface MarketingBoxOfficeInterface {
     int getAvailableDiscountedTickets(String eventName);
 
     /**
-     * Retrieves seats reserved for Lancaster’s Friends for a specific event.
+     * Retrieves seats reserved for Lancasterï¿½s Friends for a specific event.
      *
      * @param eventName The name of the event for which priority seats are requested.
-     * @return A list of seats reserved for Lancaster’s Friends.
+     * @return A list of seats reserved for Lancasterï¿½s Friends.
      */
     List<String> getFriendsPrioritySeats(String eventName);
 
     /**
-     * Retrieves trends in priority bookings for Lancaster’s Friends over the years.
+     * Retrieves trends in priority bookings for Lancasterï¿½s Friends over the years.
      *
      * @return A map containing trends in priority bookings.
      */
