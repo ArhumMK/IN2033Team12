@@ -58,7 +58,7 @@ public interface MarketingBoxOfficeInterface {
     int getAvailableDiscountedTickets(String eventName);
 
     /**
-     * Retrieves seats reserved for Lancaster�s Friends for a specific event.
+     * Retrieves seats reserved for Lancaster's Friends for a specific event.
      *
      * @param eventName The name of the event for which priority seats are requested.
      * @return A list of seats reserved for Lancaster�s Friends.
@@ -66,7 +66,7 @@ public interface MarketingBoxOfficeInterface {
     List<String> getFriendsPrioritySeats(String eventName);
 
     /**
-     * Retrieves trends in priority bookings for Lancaster�s Friends over the years.
+     * Retrieves trends in priority bookings for Lancaster's Friends over the years.
      *
      * @return A map containing trends in priority bookings.
      */
