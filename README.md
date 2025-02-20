@@ -1,9 +1,8 @@
 # IN2033 Team 12 Repository
 
-src folder contains interfaces for inter-team services.
+All code for the Team Project will be stored in this repository.
 
-## For Operations team: 
-src/MarketingOperationsInterface.java
+src folder contains classes for inter-team services.
 
-## For Box Office team: 
-src/MarketingBoxOfficeInterface.java
+
+
