@@ -3,6 +3,7 @@ import java.util.Map;
 
 public abstract class BoxOfficeBase implements BoxOfficeInterface {
 
+    // Film and Event Scheduling
     @Override
     public abstract List<String> getUpcomingFilms();
 
@@ -12,6 +13,7 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     @Override
     public abstract List<String> getFilmScheduleHistory(String filmName);
 
+    // Group Bookings
     @Override
     public abstract Map<String, String> getGroupBookingDetails(String eventName, String groupId);
 
@@ -24,6 +26,7 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     @Override
     public abstract List<String> getHeldRowsForGroupBookings(String eventName, String groupId);
 
+    // Discounts and Offers
     @Override
     public abstract Map<String, String> getDiscountPolicies(String eligibleCategory);
 
@@ -36,6 +39,7 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     @Override
     public abstract List<String> getTimeLimitedOffers();
 
+    // Lancaster's Friends Priority Bookings
     @Override
     public abstract List<String> getFriendsPrioritySeats(String eventName);
 
@@ -45,6 +49,7 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     @Override
     public abstract String getFriendsBookingPeriod(String eventName);
 
+    // Advertising & Ticket Sales Performance
     @Override
     public abstract Map<String, String> getAdvertisingCampaigns();
 
