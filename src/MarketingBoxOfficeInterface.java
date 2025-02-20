@@ -61,7 +61,7 @@ public interface MarketingBoxOfficeInterface {
      * Retrieves seats reserved for Lancaster's Friends for a specific event.
      *
      * @param eventName The name of the event for which priority seats are requested.
-     * @return A list of seats reserved for Lancaster�s Friends.
+     * @return A list of seats reserved for Lancaster's Friends.
      */
     List<String> getFriendsPrioritySeats(String eventName);
 
