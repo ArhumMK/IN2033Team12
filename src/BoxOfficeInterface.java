@@ -1,6 +1,6 @@
 import java.util.List;
 import java.util.Map;
-import dto.FilmDetails;
+
 
 
 public interface BoxOfficeInterface {

@@ -1,6 +1,7 @@
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import FilmDeta
+
 
 public class BoxOfficeImpl extends BoxOfficeBase {
 
@@ -116,6 +117,15 @@ public class BoxOfficeImpl extends BoxOfficeBase {
         // data from database to be added later
         return null; // Placeholder: return null for now.
     }
+
+    @Override
+public List<String> getBestSeatsForVIP(String eventName) {
+    System.out.println("Fetching best seats for VIP guests for event: " + eventName);
+    
+    // Placeholder return: Example VIP seat allocations
+    return Arrays.asList("A1", "A2", "B1", "B2");
+}
+
 
     @Override
     public Map<String, String> getPriorityBookingTrends(String year,String season) {
