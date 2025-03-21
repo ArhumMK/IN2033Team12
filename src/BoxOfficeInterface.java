@@ -1,5 +1,7 @@
 import java.util.List;
 import java.util.Map;
+import dto.FilmDetails;
+
 
 public interface BoxOfficeInterface {
 
@@ -15,7 +17,7 @@ public interface BoxOfficeInterface {
      * @param filmName The name of the film.
      * @return A map containing film details.
      */
-    Map<String, String> getFilmDetails(String filmName);
+    FilmDetails getFilmDetails(String filmName);
 
     /**
      * Retrieves the scheduling history for a film including when it was added, removed, or rescheduled.
@@ -23,6 +25,9 @@ public interface BoxOfficeInterface {
      * @return A list of scheduling history events.
      */
     List<String> getFilmScheduleHistory(String filmName);
+
+    
+    List<String> getConfirmedBookings(String eventName);
 
 
     // Group Bookings
@@ -100,7 +105,8 @@ public interface BoxOfficeInterface {
      * Retrieves trends in priority bookings for Lancaster's Friends over previous years.
      * @return A map containing historical booking trends.
      */
-    Map<String, String> getPriorityBookingTrends();
+    Map<String, String> getPriorityBookingTrends(String year, String season);
+
 
     /**
      * Retrieves the booking period details for Lancaster's Friends (e.g., how many weeks in advance they can book).
@@ -129,4 +135,15 @@ public interface BoxOfficeInterface {
      * @return A map containing promotion impact metrics.
      */
     Map<String, String> generatePromotionImpactReport(String eventName);
+
+    int getUsedDiscountedTickets(String eventName);
+
+    boolean confirmGroupBooking(String eventName, String groupId, int groupSize);
+    boolean cancelGroupBooking(String eventName, String groupId, int groupSize);
+    //Real-time Notifications for Low Sales Events
+     List<String> getLowSalesAlerts();
+
+     
+
+
 }

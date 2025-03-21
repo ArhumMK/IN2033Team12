@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.Map;
+import FilmDeta
 
 public class BoxOfficeImpl extends BoxOfficeBase {
 
@@ -11,11 +12,24 @@ public class BoxOfficeImpl extends BoxOfficeBase {
     }
 
     @Override
-    public Map<String, String> getFilmDetails(String filmName) {
-        System.out.println("Fetching film details for film '" + filmName + "' from the database...");
-        // data from database to be added later
-        return null; // Placeholder: return null for now.
-    }
+    
+  public FilmDetails getFilmDetails(String filmName) {
+    System.out.println("Fetching film details for film '" + filmName + "' from the database...");
+
+    // Sample hardcoded response until database integration
+    FilmDetails details = new FilmDetails();
+    details.setTitle(filmName);
+    details.setDuration("2h 10m");
+    details.setVenue("Main Hall A");
+    details.setSchedulingStatus("Scheduled");
+    details.setDirector("Jane Doe");
+    details.setGenre("Drama");
+    details.setReleaseDate("2025-04-01");
+    details.setRating("PG-13");
+
+    return details;
+}
+
 
     @Override
     public List<String> getFilmScheduleHistory(String filmName) {
@@ -104,7 +118,7 @@ public class BoxOfficeImpl extends BoxOfficeBase {
     }
 
     @Override
-    public Map<String, String> getPriorityBookingTrends() {
+    public Map<String, String> getPriorityBookingTrends(String year,String season) {
         System.out.println("Fetching historical priority booking trends from the database...");
         // data from database to be added later
         return null; // Placeholder: return null for now.
@@ -137,4 +151,36 @@ public class BoxOfficeImpl extends BoxOfficeBase {
         // data from database to be added later
         return null; // Placeholder: return null for now.
     }
+    @Override
+    public List<String> getConfirmedBookings(String eventName) {
+        System.out.println("Fetching confirmed bookings for event: " + eventName);
+        return null;
+    }
+    
+    @Override
+    public int getUsedDiscountedTickets(String eventName) {
+        System.out.println("Fetching used discounted tickets for event: " + eventName);
+        return 0;
+    }
+    
+    @Override
+    public boolean confirmGroupBooking(String eventName, String groupId, int groupSize) {
+        System.out.println("Confirming group booking for event: " + eventName + ", group: " + groupId);
+        return true;
+    }
+    
+    @Override
+    public boolean cancelGroupBooking(String eventName, String groupId, int groupSize) {
+        System.out.println("Cancelling group booking for event: " + eventName + ", group: " + groupId);
+        return true;
+    }
+    
+    @Override
+    public List<String> getLowSalesAlerts() {
+        System.out.println("Fetching real-time low sales alerts...");
+        return null;
+    }
+    
+
+
 }

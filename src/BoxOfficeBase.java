@@ -8,7 +8,8 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     public abstract List<String> getUpcomingFilms();
 
     @Override
-    public abstract Map<String, String> getFilmDetails(String filmName);
+    public abstract FilmDetails getFilmDetails(String filmName);
+
 
     @Override
     public abstract List<String> getFilmScheduleHistory(String filmName);
@@ -44,7 +45,7 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
     public abstract List<String> getFriendsPrioritySeats(String eventName);
 
     @Override
-    public abstract Map<String, String> getPriorityBookingTrends();
+    public abstract Map<String, String> getPriorityBookingTrends(String year,String season);
 
     @Override
     public abstract String getFriendsBookingPeriod(String eventName);
@@ -58,4 +59,11 @@ public abstract class BoxOfficeBase implements BoxOfficeInterface {
 
     @Override
     public abstract Map<String, String> generatePromotionImpactReport(String eventName);
+
+    public abstract List<String> getBestSeatsForVIP(String eventName);
+
+    public abstract List<String> getConfirmedBookings(String eventName);
+
+    public abstract boolean confirmGroupBooking(String eventName, String groupId, int groupSize);
+
 }
