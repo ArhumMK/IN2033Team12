@@ -124,8 +124,7 @@ public class FilmDetails {
      * 
      * @return Human-readable string with all film details.
      */
-    @Override
-    public String toString() {
+    public String getFilmDetails() {
         return "FilmDetails{" +
                 "title='" + title + '\'' +
                 ", duration='" + duration + '\'' +
