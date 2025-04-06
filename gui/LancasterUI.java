@@ -131,7 +131,7 @@ public class LancasterUI extends JFrame {
         try {
             // Load the logo from the file path
             ImageIcon icon = new ImageIcon(
-                    "D:\\Courseworks BSc Computer Science\\IN2033Team12\\resources\\lancasters-music-hall-high-resolution-logo.png");
+                    "..\\resources\\lancasters-music-hall-high-resolution-logo.png");
 
             if (icon.getIconWidth() == -1) { // Check if the icon failed to load
                 throw new Exception("Icon not found at file path");
