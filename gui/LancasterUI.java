@@ -1,14 +1,10 @@
 package gui;
 
-import InternalAPI.BoxOfficeInterface.BoxOfficeData;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class LancasterUI extends JFrame {
 
@@ -173,9 +169,20 @@ public class LancasterUI extends JFrame {
         JLabel welcomeLabel = new JLabel("Welcome to Lancaster Music Hall", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         homePanel.add(welcomeLabel, BorderLayout.CENTER);
+        String introText = "<html><div style='text-align: center;'>"
+                + "Nestled in the heart of the community, Lancaster Music Hall is your go-to destination for unforgettable performances,<br>"
+                + "cinematic experiences, and vibrant cultural events.<br><br>"
+                + "Whether you're here to enjoy a live show, catch a film, or host a special gathering,<br>"
+                + "our venue blends tradition with modern flair to bring people together through the power of the arts."
+                + "</div></html>";
+
+        JLabel introLabel = new JLabel(introText, SwingConstants.CENTER);
+        introLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        introLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+        homePanel.add(introLabel, BorderLayout.CENTER);
 
         mainPanel.add(homePanel, "Home");
-        // Show Panel
+
         JPanel showPanel = new JPanel(new BorderLayout());
         showPanel.setBackground(new Color(245, 245, 245)); // Light gray background
 
@@ -331,6 +338,91 @@ public class LancasterUI extends JFrame {
         });
 
         mainPanel.add(clientPanel, "Client");
+        // Meeting Panel
+        JPanel meetingPanel = new JPanel(new BorderLayout());
+        meetingPanel.setBackground(new Color(245, 245, 245)); // Light background
+
+        // Form for Meeting
+        JPanel meetingFormPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbcMeeting = new GridBagConstraints();
+        gbcMeeting.insets = new Insets(5, 5, 5, 5);
+        gbcMeeting.fill = GridBagConstraints.HORIZONTAL;
+
+        gbcMeeting.gridx = 0;
+        gbcMeeting.gridy = 0;
+        meetingFormPanel.add(new JLabel("Client:"), gbcMeeting);
+        gbcMeeting.gridx = 1;
+        JTextField meetingClientField = new JTextField(15);
+        meetingFormPanel.add(meetingClientField, gbcMeeting);
+
+        gbcMeeting.gridx = 0;
+        gbcMeeting.gridy = 1;
+        meetingFormPanel.add(new JLabel("Date/Time:"), gbcMeeting);
+        gbcMeeting.gridx = 1;
+        JTextField meetingDateTimeField = new JTextField(15);
+        meetingFormPanel.add(meetingDateTimeField, gbcMeeting);
+
+        gbcMeeting.gridx = 0;
+        gbcMeeting.gridy = 2;
+        meetingFormPanel.add(new JLabel("Title:"), gbcMeeting);
+        gbcMeeting.gridx = 1;
+        JTextField meetingTitleField = new JTextField(15);
+        meetingFormPanel.add(meetingTitleField, gbcMeeting);
+
+        gbcMeeting.gridx = 0;
+        gbcMeeting.gridy = 3;
+        meetingFormPanel.add(new JLabel("Location:"), gbcMeeting);
+        gbcMeeting.gridx = 1;
+        JTextField meetingLocationField = new JTextField(15);
+        meetingFormPanel.add(meetingLocationField, gbcMeeting);
+
+        // Button for Meeting
+        JPanel meetingButtonPanel = new JPanel(new FlowLayout());
+        JButton addMeetingButton = new JButton("Add Meeting");
+        addMeetingButton.setBackground(new Color(0, 123, 255));
+        addMeetingButton.setForeground(Color.WHITE);
+        meetingButtonPanel.add(addMeetingButton);
+        gbcMeeting.gridx = 0;
+        gbcMeeting.gridy = 4;
+        gbcMeeting.gridwidth = 2;
+        meetingFormPanel.add(meetingButtonPanel, gbcMeeting);
+
+        meetingPanel.add(meetingFormPanel, BorderLayout.NORTH);
+
+        // Table for Meeting
+        String[] meetingColumns = { "Client", "Date/Time", "Title", "Location", "Actions" };
+        DefaultTableModel meetingTableModel = new DefaultTableModel(meetingColumns, 0);
+        JTable meetingTable = new JTable(meetingTableModel);
+        JScrollPane meetingScrollPane = new JScrollPane(meetingTable);
+        meetingPanel.add(meetingScrollPane, BorderLayout.CENTER);
+
+        // Add action to the button
+        addMeetingButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String client = meetingClientField.getText();
+                String dateTime = meetingDateTimeField.getText();
+                String title = meetingTitleField.getText();
+                String location = meetingLocationField.getText();
+
+                if (client.isEmpty() || dateTime.isEmpty() || title.isEmpty() || location.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Please fill in all meeting fields.");
+                    return;
+                }
+
+                String[] row = { client, dateTime, title, location, "Edit/Delete" };
+                meetingTableModel.addRow(row);
+
+                // Clear inputs
+                meetingClientField.setText("");
+                meetingDateTimeField.setText("");
+                meetingTitleField.setText("");
+                meetingLocationField.setText("");
+            }
+        });
+
+        mainPanel.add(meetingPanel, "Meeting");
+
         // Held Seats Panel
         JPanel heldSeatsPanel = new JPanel(new BorderLayout());
         heldSeatsPanel.setBackground(new Color(245, 245, 245));
@@ -397,12 +489,13 @@ public class LancasterUI extends JFrame {
         });
 
         // Placeholder panels for other services
-        for (String service : new String[] { "Screening", "Film", "Meeting", "Invoice", "Group Sale",
+        for (String service : new String[] { "Screening", "Film", "Invoice", "Group Sale",
                 "Group", "FoL", "Held/Seats", "Ticket Sales", "Film Orders" }) {
             JPanel placeholderPanel = new JPanel();
             placeholderPanel.add(new JLabel("Panel for " + service));
             mainPanel.add(placeholderPanel, service);
         }
+
         JPanel screeningPanel = new JPanel(new BorderLayout());
         screeningPanel.setBackground(new Color(245, 245, 245));
 
@@ -494,6 +587,7 @@ public class LancasterUI extends JFrame {
         });
 
         mainPanel.add(screeningPanel, "Screening");
+
         JPanel folPanel = new JPanel(new BorderLayout());
         folPanel.setBackground(new Color(245, 245, 245)); // Light gray background
 
