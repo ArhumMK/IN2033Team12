@@ -9,503 +9,316 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// DTO Classes
+class FilmDetails {
+    private String filmName;
+    private int durationMinutes;
+    private String genre;
+
+    // Getters and Setters
+    public String getFilmName() { return filmName; }
+    public void setFilmName(String filmName) { this.filmName = filmName; }
+    public int getDurationMinutes() { return durationMinutes; }
+    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+    public String getGenre() { return genre; }
+    public void setGenre(String genre) { this.genre = genre; }
+}
+
+class BookingDTO {
+    private int bookingId;
+    private int patronId;
+    private double totalCost;
+
+    // Getters and Setters
+    public int getBookingId() { return bookingId; }
+    public void setBookingId(int bookingId) { this.bookingId = bookingId; }
+    public int getPatronId() { return patronId; }
+    public void setPatronId(int patronId) { this.patronId = patronId; }
+    public double getTotalCost() { return totalCost; }
+    public void setTotalCost(double totalCost) { this.totalCost = totalCost; }
+}
+
+class GroupBookingDTO {
+    private int groupSize;
+    private String companyName;
+    private String contactName;
+    private String contactEmail;
+
+    // Getters and Setters
+    public int getGroupSize() { return groupSize; }
+    public void setGroupSize(int groupSize) { this.groupSize = groupSize; }
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getContactName() { return contactName; }
+    public void setContactName(String contactName) { this.contactName = contactName; }
+    public String getContactEmail() { return contactEmail; }
+    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
+}
+
+class DiscountPolicyDTO {
+    private String discountId;
+    private double discountPercentage;
+
+    // Getters and Setters
+    public String getDiscountId() { return discountId; }
+    public void setDiscountId(String discountId) { this.discountId = discountId; }
+    public double getDiscountPercentage() { return discountPercentage; }
+    public void setDiscountPercentage(double discountPercentage) { this.discountPercentage = discountPercentage; }
+}
+
+// Main MarketingData Class
 public class MarketingData implements MarketingInterface {
 
-    // Marketing Campaign Performance Data
     @Override
-    public Map<String, Integer> getMarketingEfforts(String eventId, LocalDate startDate, LocalDate endDate) {
-        Map<String, Integer> efforts = new HashMap<>();
-        String query = "SELECT campaign_type, SUM(clicks) as total_clicks " +
-                "FROM MarketingCampaign " +
-                "WHERE event_id = ? AND start_date >= ? AND end_date <= ? " +
-                "GROUP BY campaign_type";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setDate(2, java.sql.Date.valueOf(startDate));
-            stmt.setDate(3, java.sql.Date.valueOf(endDate));
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                efforts.put(rs.getString("campaign_type"), rs.getInt("total_clicks"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return efforts;
+    public String getMarketingEfforts(String eventName, LocalDate eventDate, String eventTime, LocalDate startDate, LocalDate endDate) {
+        return "";
     }
 
     @Override
-    public Map<String, Integer> getTicketPurchaseStatistics(String campaignId) {
-        Map<String, Integer> stats = new HashMap<>();
-        String query = "SELECT 'TicketsSold', COUNT(*) as count " +
-                "FROM Booking WHERE campaign_id = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, campaignId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                stats.put("TicketsSold", rs.getInt("count"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return stats;
+    public String getTicketPurchaseStatistics(String campaignId) {
+        return "";
     }
 
     @Override
-    public Map<String, Double> getPromotionalChannelEffectiveness(String eventId) {
-        Map<String, Double> effectiveness = new HashMap<>();
-        String query = "SELECT campaign_type, (SUM(clicks) / SUM(impressions)) * 100 as effectiveness " +
-                "FROM MarketingCampaign WHERE event_id = ? GROUP BY campaign_type";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                effectiveness.put(rs.getString("campaign_type"), rs.getDouble("effectiveness"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return effectiveness;
+    public String getPromotionalChannelEffectiveness(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
-    // Audience Demographics & Engagement Data
     @Override
-    public Map<String, String> getAudienceDemographics(String eventInstanceId) {
-        Map<String, String> demographics = new HashMap<>();
-        String query = "SELECT age_group, COUNT(*) as count " +
-                "FROM Attendee WHERE event_instance_id = ? GROUP BY age_group";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventInstanceId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                demographics.put(rs.getString("age_group"), String.valueOf(rs.getInt("count")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return demographics;
+    public String getAudienceDemographics(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
     @Override
     public Map<String, Integer> getPastVisitInformation(String eventId) {
-        Map<String, Integer> visits = new HashMap<>();
-        String query = "SELECT 'RepeatAttendees', COUNT(DISTINCT patron_id) as count " +
-                "FROM Booking WHERE event_id = ? AND patron_id IN " +
-                "(SELECT patron_id FROM Booking WHERE event_id != ? GROUP BY patron_id HAVING COUNT(*) > 1)";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, eventId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                visits.put("RepeatAttendees", rs.getInt("count"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return visits;
+        return Map.of();
     }
 
-    // Ticket Demand Forecasting Data
     @Override
-    public Map<String, Integer> getTicketSalesTrends(String eventId, String forecastWindow) {
-        Map<String, Integer> trends = new HashMap<>();
-        String query = "SELECT DATE(booking_date) as sale_date, COUNT(*) as sales " +
-                "FROM Booking WHERE event_id = ? AND booking_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY) " +
-                "GROUP BY sale_date";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setInt(2, Integer.parseInt(forecastWindow.replace(" days", "")));
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                trends.put(rs.getString("sale_date"), rs.getInt("sales"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return trends;
+    public String getTicketSalesTrends(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
     @Override
     public List<LocalDate> getHighTrafficDates(String eventId) {
-        List<LocalDate> dates = new ArrayList<>();
-        String query = "SELECT DATE(booking_date) as high_date " +
-                "FROM Booking WHERE event_id = ? GROUP BY high_date " +
-                "HAVING COUNT(*) > (SELECT AVG(daily_count) FROM (SELECT COUNT(*) as daily_count " +
-                "FROM Booking WHERE event_id = ? GROUP BY DATE(booking_date)) as avg)";
+        return List.of();
+    }
 
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, eventId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                dates.add(rs.getDate("high_date").toLocalDate());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return dates;
+    @Override
+    public List<LocalDate> getHighTrafficDates(String eventId, String timeframe) {
+        return List.of();
     }
 
     @Override
     public Map<String, Integer> getPreSaleTrends(String eventId, String ticketType) {
-        Map<String, Integer> trends = new HashMap<>();
-        String query = "SELECT 'PreSaleCount', COUNT(*) as count " +
-                "FROM Booking WHERE event_id = ? AND ticket_type = ? AND booking_date < (SELECT event_date FROM Shows WHERE show_id = ?)";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, ticketType);
-            stmt.setString(3, eventId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                trends.put("PreSaleCount", rs.getInt("count"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return trends;
+        return Map.of();
     }
 
-    // Event Promotion & Discount Strategy Data
     @Override
-    public Map<String, String> getPromotionalDiscounts(String eventId, String discountType) {
-        Map<String, String> discounts = new HashMap<>();
-        String query = "SELECT discount_id, discount_percentage " +
-                "FROM Discount WHERE event_id = ? AND discount_type = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, discountType);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                discounts.put("DiscountID", rs.getString("discount_id"));
-                discounts.put("Percentage", rs.getString("discount_percentage"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return discounts;
+    public List<DiscountPolicyDTO> getPromotionalDiscounts(String eventId, String discountType) {
+        return List.of();
     }
 
     @Override
     public Map<String, String> getTicketCategories(String eventId) {
-        Map<String, String> categories = new HashMap<>();
-        String query = "SELECT ticket_type, COUNT(*) as count " +
-                "FROM Booking WHERE event_id = ? GROUP BY ticket_type";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                categories.put(rs.getString("ticket_type"), String.valueOf(rs.getInt("count")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return categories;
+        return Map.of();
     }
 
     @Override
-    public Map<String, String> getPriceAdjustments(String eventId, String timeframe) {
-        Map<String, String> adjustments = new HashMap<>();
-        String query = "SELECT adjustment_date, new_price " +
-                "FROM PriceAdjustment WHERE event_id = ? AND adjustment_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setInt(2, Integer.parseInt(timeframe.replace(" days", "")));
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                adjustments.put(rs.getString("adjustment_date"), rs.getString("new_price"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return adjustments;
+    public String getPriceAdjustments(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
-    // Customer Feedback & Sentiment Analysis Data
     @Override
-    public Map<String, String> getPostEventFeedback(String eventInstanceId, String sentimentFilter) {
-        Map<String, String> feedback = new HashMap<>();
-        String query = "SELECT sentiment, COUNT(*) as count " +
-                "FROM Feedback WHERE event_instance_id = ? AND (? IS NULL OR sentiment = ?) GROUP BY sentiment";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventInstanceId);
-            stmt.setString(2, sentimentFilter);
-            stmt.setString(3, sentimentFilter);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                feedback.put(rs.getString("sentiment"), String.valueOf(rs.getInt("count")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return feedback;
+    public String getPostEventFeedback(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
     @Override
     public double getCustomerSatisfaction(String eventInstanceId, String aspect) {
-        String query = "SELECT AVG(satisfaction_score) as score " +
-                "FROM Feedback WHERE event_instance_id = ? AND aspect = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventInstanceId);
-            stmt.setString(2, aspect);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getDouble("score");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return 0.0;
+        return 0;
     }
 
     @Override
     public List<String> getCommonComplaints(String eventInstanceId, String complaintCategory) {
-        List<String> complaints = new ArrayList<>();
-        String query = "SELECT comment FROM Feedback WHERE event_instance_id = ? AND aspect = ? AND sentiment = 'Negative'";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventInstanceId);
-            stmt.setString(2, complaintCategory);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                complaints.add(rs.getString("comment"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return complaints;
-    }
-
-    // Partnership & Sponsorship Data
-    @Override
-    public Map<String, String> getPartnershipDetails(String eventId, String partnerType) {
-        Map<String, String> details = new HashMap<>();
-        String query = "SELECT partner_name, branding_requirements " +
-                "FROM Partnership WHERE event_id = ? AND partner_type = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, partnerType);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                details.put("PartnerName", rs.getString("partner_name"));
-                details.put("BrandingRequirements", rs.getString("branding_requirements"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return details;
+        return List.of();
     }
 
     @Override
-    public Map<String, String> getBrandingObligations(String eventId, String venueSection) {
-        Map<String, String> obligations = new HashMap<>();
-        String query = "SELECT partner_name, branding_requirements " +
-                "FROM Partnership WHERE event_id = ? AND venue_section = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, venueSection);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                obligations.put(rs.getString("partner_name"), rs.getString("branding_requirements"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return obligations;
+    public String getPartnershipDetails(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
     @Override
-    public Map<String, String> getSponsorAreaRequirements(String eventId, String sponsorId) {
-        Map<String, String> requirements = new HashMap<>();
-        String query = "SELECT requirement_type, requirement_value " +
-                "FROM SponsorRequirements WHERE event_id = ? AND sponsor_id = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventId);
-            stmt.setString(2, sponsorId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                requirements.put(rs.getString("requirement_type"), rs.getString("requirement_value"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return requirements;
-    }
-
-    // Group Bookings & Company Data
-    @Override
-    public Map<String, String> getGroupBookingDetails(String eventName, String groupId) {
-        Map<String, String> details = new HashMap<>();
-        String query = "SELECT gb.group_size, c.company_name, c.contact_name, c.contact_email " +
-                "FROM GroupBooking gb " +
-                "JOIN Booking b ON gb.booking_id = b.booking_id " +
-                "JOIN Company c ON gb.company_id = c.company_id " +
-                "JOIN Shows s ON b.show_id = s.show_id " +
-                "WHERE s.show_title = ? AND gb.group_id = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventName);
-            stmt.setString(2, groupId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                details.put("GroupSize", String.valueOf(rs.getInt("group_size")));
-                details.put("CompanyName", rs.getString("company_name"));
-                details.put("ContactName", rs.getString("contact_name"));
-                details.put("ContactEmail", rs.getString("contact_email"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return details;
+    public String getBrandingObligations(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
     @Override
-    public List<String> getCompaniesBookedForEvent(String eventName) {
-        List<String> companies = new ArrayList<>();
-        String query = "SELECT DISTINCT c.company_name " +
-                "FROM GroupBooking gb " +
-                "JOIN Booking b ON gb.booking_id = b.booking_id " +
-                "JOIN Company c ON gb.company_id = c.company_id " +
-                "JOIN Shows s ON b.show_id = s.show_id " +
-                "WHERE s.show_title = ?";
-
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventName);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                companies.add(rs.getString("company_name"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return companies;
+    public String getSponsorAreaRequirements(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
     }
 
-    // Advertising & Promotion Data
     @Override
-    public Map<String, String> getAdvertisingCampaigns() {
-        Map<String, String> campaigns = new HashMap<>();
-        String query = "SELECT campaign_id, event_id FROM MarketingCampaign WHERE active = 1";
+    public GroupBookingDTO getGroupBookingDetails(String eventName, LocalDate eventDate, String eventTime, String groupId) {
+        return null;
+    }
 
-        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                campaigns.put(rs.getString("campaign_id"), rs.getString("event_id"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return campaigns;
+    @Override
+    public List<String> getCompaniesBookedForEvent(String eventName, LocalDate eventDate, String eventTime) {
+        return List.of();
+    }
+
+    @Override
+    public String getAdvertisingCampaigns() {
+        return "";
     }
 
     @Override
     public List<String> getEventsNeedingPromotion() {
-        List<String> events = new ArrayList<>();
-        String query = "SELECT s.show_title " +
-                "FROM Shows s LEFT JOIN Booking b ON s.show_id = b.show_id " +
-                "GROUP BY s.show_id, s.show_title " +
-                "HAVING COUNT(b.booking_id) < (SELECT AVG(booking_count) FROM (SELECT COUNT(*) as booking_count " +
-                "FROM Booking GROUP BY show_id) as avg)";
+        return List.of();
+    }
 
+    @Override
+    public String generatePromotionImpactReport(String eventName, LocalDate eventDate, String eventTime) {
+        return "";
+    }
+
+    @Override
+    public List<String> getBestSeatsForVIP(String eventName, LocalDate eventDate, String eventTime, String vipType) {
+        List<String> seats = new ArrayList<>();
+        String query = "SELECT seat_code FROM VIPSeats WHERE event_name = ? AND event_date = ? AND event_time = ? AND vip_type = ?";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, eventName);
+            stmt.setDate(2, java.sql.Date.valueOf(eventDate));
+            stmt.setString(3, eventTime);
+            stmt.setString(4, vipType);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                seats.add(rs.getString("seat_code"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return seats;
+    }
+
+    @Override
+    public List<BookingDTO> getConfirmedBookings(String eventName, LocalDate eventDate, String eventTime) {
+        List<BookingDTO> bookings = new ArrayList<>();
+        String query = "SELECT b.booking_id, b.patron_id, b.total_cost " +
+                "FROM Booking b JOIN Shows s ON b.show_id = s.show_id " +
+                "WHERE s.show_title = ? AND s.event_date = ? AND s.event_time = ? AND b.is_confirmed = 1";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, eventName);
+            stmt.setDate(2, java.sql.Date.valueOf(eventDate));
+            stmt.setString(3, eventTime);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                BookingDTO booking = new BookingDTO();
+                booking.setBookingId(rs.getInt("booking_id"));
+                booking.setPatronId(rs.getInt("patron_id"));
+                booking.setTotalCost(rs.getDouble("total_cost"));
+                bookings.add(booking);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return bookings;
+    }
+
+    @Override
+    public Map<String, Object> getPriorityBookingTrends(String year, String season) {
+        Map<String, Object> trends = new HashMap<>();
+        String query = "SELECT COUNT(*) as count, booking_type FROM Booking WHERE year(booking_date) = ? AND season = ? GROUP BY booking_type";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, year);
+            stmt.setString(2, season);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                trends.put(rs.getString("booking_type"), rs.getInt("count"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return trends;
+    }
+
+    @Override
+    public int getUsedDiscountedTickets(String eventName, LocalDate eventDate, String eventTime) {
+        String query = "SELECT COUNT(*) as used FROM Booking b JOIN Shows s ON b.show_id = s.show_id " +
+                "WHERE s.show_title = ? AND s.event_date = ? AND s.event_time = ? AND b.is_discount_applied = 1";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, eventName);
+            stmt.setDate(2, java.sql.Date.valueOf(eventDate));
+            stmt.setString(3, eventTime);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("used");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean confirmGroupBooking(String eventName, String groupId, int groupSize) {
+        String query = "UPDATE GroupBooking SET is_confirmed = 1 WHERE group_id = ? AND event_name = ?";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, groupId);
+            stmt.setString(2, eventName);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean cancelGroupBooking(String eventName, String groupId, int groupSize) {
+        String query = "UPDATE GroupBooking SET is_cancelled = 1 WHERE group_id = ? AND event_name = ?";
+        try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
+            stmt.setString(1, groupId);
+            stmt.setString(2, eventName);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<String> getLowSalesAlerts() {
+        List<String> alerts = new ArrayList<>();
+        String query = "SELECT s.show_title FROM Shows s LEFT JOIN Booking b ON s.show_id = b.show_id " +
+                "GROUP BY s.show_id, s.show_title HAVING COUNT(b.booking_id) < 10";
         try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                events.add(rs.getString("show_title"));
+                alerts.add(rs.getString("show_title"));
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
-        return events;
+        return alerts;
     }
 
     @Override
-    public Map<String, String> generatePromotionImpactReport(String eventName) {
-        Map<String, String> report = new HashMap<>();
-        String query = "SELECT 'TicketSales', COUNT(*) as sales " +
-                "FROM Booking b JOIN Shows s ON b.show_id = s.show_id " +
-                "WHERE s.show_title = ? AND b.campaign_id IS NOT NULL";
-
+    public FilmDetails getFilmDetails(String filmName) {
+        FilmDetails details = new FilmDetails();
+        String query = "SELECT film_name, duration_minutes, genre FROM Films WHERE film_name = ?";
         try (PreparedStatement stmt = JDBC.getConnection().prepareStatement(query)) {
-            stmt.setString(1, eventName);
+            stmt.setString(1, filmName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                report.put("TicketSalesFromPromotion", String.valueOf(rs.getInt("sales")));
+                details.setFilmName(rs.getString("film_name"));
+                details.setDurationMinutes(rs.getInt("duration_minutes"));
+                details.setGenre(rs.getString("genre"));
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
-        return report;
-    }
-
-    // Notification Placeholders
-    @Override
-    public void notifyGroupBookingConfirmation(String eventName, String groupId, int groupSize) {
-        System.out.println("Notifying group booking confirmation for event '" + eventName +
-                "' by group '" + groupId + "' with " + groupSize + " seats.");
-        // Placeholder for future notification system integration
-    }
-
-    @Override
-    public void notifyGroupBookingCancellation(String eventName, String groupId, int groupSize) {
-        System.out.println("Notifying group booking cancellation for event '" + eventName +
-                "' by group '" + groupId + "' with " + groupSize + " seats.");
-        // Placeholder for future notification system integration
+        return details;
     }
 }
