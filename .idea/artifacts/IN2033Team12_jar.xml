@@ -3,8 +3,8 @@
     <output-path>$PROJECT_DIR$/out/artifacts/IN2033Team12_jar</output-path>
     <root id="archive" name="IN2033Team12.jar">
       <element id="module-output" name="IN2033Team12" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/json-20250107.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-j-9.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/json-20250107.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

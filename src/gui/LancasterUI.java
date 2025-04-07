@@ -22,8 +22,9 @@ public class LancasterUI extends JFrame {
     public LancasterUI() {
         setTitle("Cinema Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(1280, 720);
         setMinimumSize(new Dimension(600, 400));
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         setupSidebar();
@@ -42,11 +43,10 @@ public class LancasterUI extends JFrame {
         sidebarPanel = new JPanel();
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
         sidebarPanel.setBackground(Color.decode("#2FCC40"));
-        sidebarPanel.setPreferredSize(new Dimension(140, getHeight()));
+        sidebarPanel.setPreferredSize(new Dimension(200, getHeight()));
         sidebarPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        String[] services = { "Home", "Show", "Screening", "Film", "Meeting", "Client", "Invoice",
-                "Group Sale", "Group", "Held/Seats", "Ticket Sales", "Film Orders" };
+        String[] services = { "Home", "Show", "Screening", "Film", "Meeting", "Client", "Invoice", "Group", "Held/Seats"};
 
         for (String service : services) {
             // Custom button with underline effect
@@ -55,7 +55,7 @@ public class LancasterUI extends JFrame {
             button.setBackground(Color.decode("#122023"));
             button.setForeground(Color.WHITE);
             button.setFont(new Font("Arial", Font.PLAIN, 12));
-            button.setMaximumSize(new Dimension(120, 30));
+            button.setMaximumSize(new Dimension(200, 30));
             button.setCursor(new Cursor(Cursor.HAND_CURSOR));
             button.setFocusPainted(false);
             button.setBorder(BorderFactory.createCompoundBorder(
@@ -96,16 +96,16 @@ public class LancasterUI extends JFrame {
     private void setupTopBar() {
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(Color.decode("#122023")); // Original color restored
-        topBar.setPreferredSize(new Dimension(getWidth(), 50));
+        topBar.setPreferredSize(new Dimension(getWidth(), 80));
         topBar.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JLabel iconLabel = new JLabel();
         iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
         iconLabel.setVerticalAlignment(SwingConstants.CENTER);
         try {
-            ImageIcon icon = new ImageIcon("resources/noBackground.png");
+            ImageIcon icon = new ImageIcon("src/resources/noBackground.png");
             if (icon.getIconWidth() == -1) throw new Exception("Icon not found");
-            Image scaledImage = icon.getImage().getScaledInstance(110, 64, Image.SCALE_SMOOTH);
+            Image scaledImage = icon.getImage().getScaledInstance(150, 87, Image.SCALE_SMOOTH);
             iconLabel.setIcon(new ImageIcon(scaledImage));
         } catch (Exception e) {
             System.out.println("Failed to load logo: " + e.getMessage());
@@ -204,7 +204,7 @@ public class LancasterUI extends JFrame {
         logoLabel.setHorizontalAlignment(SwingConstants.CENTER);
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         try {
-            ImageIcon icon = new ImageIcon("resources/logo.png");
+            ImageIcon icon = new ImageIcon("src/resources/logo.png");
             if (icon.getIconWidth() == -1) throw new Exception("Logo not found");
             Image scaledImage = icon.getImage().getScaledInstance(200, 116, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(scaledImage));
@@ -261,7 +261,7 @@ public class LancasterUI extends JFrame {
         mainPanel.add(homePanel, "Home");
 
         // Other Panels
-        JPanel showPanel = createFormPanel("Show", new String[] {"ShowID","Date", "Start Time", "Name", "Venue", "Price", "Discount", "Description", "Actions"});
+        JPanel showPanel = createFormPanel("Show", new String[] {"ShowID","Date", "Start Time", "Name", "Venue", "Price", "Discount", "Description"});
         mainPanel.add(showPanel, "Show");
 
         JPanel clientPanel = createFormPanel("Client", new String[] {"ClientID", "CompanyID", "ContactEmail", "ContactName","StreetAddress"});
@@ -269,17 +269,17 @@ public class LancasterUI extends JFrame {
         JPanel meetingPanel = createFormPanel("Meeting", new String[] {"ClientID","MeetingID","Date","Time","Location"});
         mainPanel.add(meetingPanel, "Meeting");
 
-        JPanel heldSeatsPanel = createFormPanel("Held/Seats", new String[] { "SeatID", "ScreeningID", "ShowID", "Actions"});
+        JPanel heldSeatsPanel = createFormPanel("Held/Seats", new String[] { "SeatID", "ScreeningID", "ShowID"});
         mainPanel.add(heldSeatsPanel, "Held/Seats");
 
         JPanel screeningPanel = createFormPanel("Screening", new String[] {"ScreeningID","Date", "Start Time", "FilmID", "Price", "ScreeningID"});
         mainPanel.add(screeningPanel, "Screening");
 
-        JPanel folPanel = createFormPanel("FoL", new String[] {"Name", "Address", "Email", "Actions"});
+        JPanel folPanel = createFormPanel("FoL", new String[] {"Name", "Address", "Email"});
         mainPanel.add(folPanel, "FoL");
 
         JPanel filmPanel = createFormPanel("Film", new String[] {
-                "FilmID", "Name", "Certificate", "Actions"
+                "FilmID", "Name", "Certificate"
         });
         mainPanel.add(filmPanel, "Film");
 
@@ -292,20 +292,20 @@ public class LancasterUI extends JFrame {
 
         // === Invoice Panel ===
         JPanel invoicePanel = createFormPanel("Invoice", new String[] {
-                "InvoiceID", "FilmOrderID", "Date", "Costs", "Total", "ClientID", "Actions"
+                "InvoiceID", "FilmOrderID", "Date", "Costs", "Total", "ClientID"
         });
         mainPanel.add(invoicePanel, "Invoice");
 
         JPanel groupSalePanel = createFormPanel("GroupSale", new String[] {
-                "GroupSaleID", "GroupID", "CompanyID", "ShowID", "SeatsQuantity", "Discount", "Confirmed", "Actions"
+                "GroupSaleID", "GroupID", "CompanyID", "ShowID", "SeatsQuantity", "Discount", "Confirmed"
         });
         mainPanel.add(groupSalePanel, "Group Sale");
         JPanel groupPanel = createFormPanel("Group", new String[] {
-                "GroupID", "CompanyID", "GroupName", "ContactEmail", "Actions"
+                "GroupID", "CompanyID", "GroupName", "ContactEmail"
         });
         mainPanel.add(groupPanel, "Group");
         JPanel ticketSalesPanel = createFormPanel("TicketSales", new String[] {
-                "TicketID", "InvoiceID", "FilmOrderID", "Quantity", "Value", "Actions"
+                "TicketID", "InvoiceID", "FilmOrderID", "Quantity", "Value"
         });
         mainPanel.add(ticketSalesPanel, "Ticket Sales");
 
@@ -336,7 +336,7 @@ public class LancasterUI extends JFrame {
             formPanel.add(label, gbc);
 
             gbc.gridx = 1;
-            if (panelName.equals("Client") && i == 1 || panelName.equals("FoL") && i == 1) {
+            if (panelName.equals("FoL") && i == 1) {
                 JTextArea textArea = new JTextArea(3, 15);
                 textArea.setFont(new Font("Arial", Font.PLAIN, 14));
                 textArea.setLineWrap(true);
@@ -508,7 +508,7 @@ public class LancasterUI extends JFrame {
 
         JTable table = new JTable(tableModel);
         styleTable(table);
-       
+
 
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -581,7 +581,7 @@ public class LancasterUI extends JFrame {
             //case "fol": return "friends_of_lancaster"; // Or whatever you use
             case "held/seats": return "HeldSeats";
             case "ticket sales": return "TicketSales";
-            case "film orders": return "FilmOrder";
+            //case "film orders": return "FilmOrder";
             default: throw new IllegalArgumentException("Unknown panel name: " + panelName);
         }
     }
@@ -657,16 +657,40 @@ public class LancasterUI extends JFrame {
         try {
             model.setRowCount(0); // Clear current rows
             Connection conn = JDBC.getConnection();
-            String query = "SELECT * FROM " + getTableName(panelName);
+
+            // Determine if the last column is "Actions"
+            boolean hasActionsColumn = tableColumns[tableColumns.length - 1].equalsIgnoreCase("Actions");
+            int columnsToLoad = hasActionsColumn ? tableColumns.length - 1 : tableColumns.length;
+
+            // Construct the SELECT query to match tableColumns (excluding "Actions")
+            StringBuilder selectColumns = new StringBuilder();
+            for (int i = 0; i < columnsToLoad; i++) {
+                // Clean column names to match database column names
+                String col = tableColumns[i]
+                        .trim()
+                        .replace(" ", "") // Remove spaces (e.g., "Start Time" -> "StartTime")
+                        .replaceAll("[^a-zA-Z0-9_]", ""); // Remove special characters
+                selectColumns.append(col);
+                if (i < columnsToLoad - 1) {
+                    selectColumns.append(", ");
+                }
+            }
+            String query = "SELECT " + selectColumns.toString() + " FROM " + getTableName(panelName);
             PreparedStatement pstmt = conn.prepareStatement(query);
             java.sql.ResultSet rs = pstmt.executeQuery();
 
+            // Debug: Print the query and column count
+            System.out.println("Panel: " + panelName + ", Query: " + query);
+            System.out.println("Column count in ResultSet: " + rs.getMetaData().getColumnCount());
+
             while (rs.next()) {
                 String[] rowData = new String[tableColumns.length];
-                for (int i = 0; i < tableColumns.length - 1; i++) { // skip 'Actions' column
-                    rowData[i] = rs.getString(i + 1);
+                for (int i = 0; i < columnsToLoad; i++) {
+                    rowData[i] = rs.getString(i + 1) != null ? rs.getString(i + 1) : "";
                 }
-                rowData[tableColumns.length - 1] = ""; // Placeholder for actions column
+                if (hasActionsColumn) {
+                    rowData[tableColumns.length - 1] = ""; // Placeholder for actions column
+                }
                 model.addRow(rowData);
             }
 
