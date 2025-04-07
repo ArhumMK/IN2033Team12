@@ -7,9 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="InternalAPI" level="application" />
-    <orderEntry type="library" name="mysql-connector-j-9.2.0" level="application" />
-    <orderEntry type="library" name="InternalAPI" level="application" />
-    <orderEntry type="library" name="json-20250107" level="application" />
+    <orderEntry type="library" exported="" name="json-20250107" level="project" />
+    <orderEntry type="library" exported="" name="mysql-connector-j-9.2.0" level="project" />
   </component>
 </module>
