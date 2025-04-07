@@ -1,5 +1,7 @@
 package gui;
 
+import api.JDBC;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -8,7 +10,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 public class LancasterUI extends JFrame {
 
     private JPanel sidebarPanel;
@@ -257,33 +261,54 @@ public class LancasterUI extends JFrame {
         mainPanel.add(homePanel, "Home");
 
         // Other Panels
-        JPanel showPanel = createFormPanel("Show", new String[] {"Date", "Start Time", "Name", "Venue", "Price", "Actions"});
+        JPanel showPanel = createFormPanel("Show", new String[] {"ShowID","Date", "Start Time", "Name", "Venue", "Price", "Discount", "Description", "Actions"});
         mainPanel.add(showPanel, "Show");
 
-        JPanel clientPanel = createFormPanel("Client", new String[] {"Name", "Address", "Email", "Actions"});
+        JPanel clientPanel = createFormPanel("Client", new String[] {"ClientID", "CompanyID", "ContactEmail", "ContactName","StreetAddress"});
         mainPanel.add(clientPanel, "Client");
-
-        JPanel meetingPanel = createFormPanel("Meeting", new String[] {"Client", "Date/Time", "Title", "Location", "Actions"});
+        JPanel meetingPanel = createFormPanel("Meeting", new String[] {"ClientID","MeetingID","Date","Time","Location"});
         mainPanel.add(meetingPanel, "Meeting");
 
-        JPanel heldSeatsPanel = createFormPanel("Held/Seats", new String[] {"Show / Date", "Seats", "Actions"});
+        JPanel heldSeatsPanel = createFormPanel("Held/Seats", new String[] { "SeatID", "ScreeningID", "ShowID", "Actions"});
         mainPanel.add(heldSeatsPanel, "Held/Seats");
 
-        JPanel screeningPanel = createFormPanel("Screening", new String[] {"Date", "Start Time", "Film", "Price", "Actions"});
+        JPanel screeningPanel = createFormPanel("Screening", new String[] {"ScreeningID","Date", "Start Time", "FilmID", "Price", "ScreeningID"});
         mainPanel.add(screeningPanel, "Screening");
 
         JPanel folPanel = createFormPanel("FoL", new String[] {"Name", "Address", "Email", "Actions"});
         mainPanel.add(folPanel, "FoL");
 
-        JPanel filmPanel = createFormPanel("Film", new String[] {"Name", "Certificate", "Actions"});
+        JPanel filmPanel = createFormPanel("Film", new String[] {
+                "FilmID", "Name", "Certificate", "Actions"
+        });
         mainPanel.add(filmPanel, "Film");
 
-        for (String service : new String[] {"Invoice", "Group Sale", "Group", "Ticket Sales", "Film Orders"}) {
+        for (String service : new String[] {  "Film Orders"}) {
             JPanel placeholderPanel = new JPanel(new BorderLayout());
             placeholderPanel.setBackground(new Color(245, 245, 245));
             placeholderPanel.add(new JLabel("Panel for " + service, SwingConstants.CENTER), BorderLayout.CENTER);
             mainPanel.add(placeholderPanel, service);
         }
+
+        // === Invoice Panel ===
+        JPanel invoicePanel = createFormPanel("Invoice", new String[] {
+                "InvoiceID", "FilmOrderID", "Date", "Costs", "Total", "ClientID", "Actions"
+        });
+        mainPanel.add(invoicePanel, "Invoice");
+
+        JPanel groupSalePanel = createFormPanel("GroupSale", new String[] {
+                "GroupSaleID", "GroupID", "CompanyID", "ShowID", "SeatsQuantity", "Discount", "Confirmed", "Actions"
+        });
+        mainPanel.add(groupSalePanel, "Group Sale");
+        JPanel groupPanel = createFormPanel("Group", new String[] {
+                "GroupID", "CompanyID", "GroupName", "ContactEmail", "Actions"
+        });
+        mainPanel.add(groupPanel, "Group");
+        JPanel ticketSalesPanel = createFormPanel("TicketSales", new String[] {
+                "TicketID", "InvoiceID", "FilmOrderID", "Quantity", "Value", "Actions"
+        });
+        mainPanel.add(ticketSalesPanel, "Ticket Sales");
+
     }
 
     private JPanel createFormPanel(String panelName, String[] tableColumns) {
@@ -390,13 +415,93 @@ public class LancasterUI extends JFrame {
                 addButton.setBackground(new Color(0, 123, 255));
             }
         });
+
         buttonPanel.add(addButton);
+        buttonPanel.add(Box.createHorizontalStrut(10)); // optional spacing
+        // ✅ ADD the view button to the panel
+
         gbc.gridx = 0;
         gbc.gridy = inputs.length;
         gbc.gridwidth = 2;
         formPanel.add(buttonPanel, gbc);
 
         panel.add(formPanel, BorderLayout.NORTH);
+        JButton viewButton = new JButton("View All " + panelName) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                super.paintComponent(g2);
+                g2.dispose();
+            }
+
+            @Override
+            protected void paintBorder(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.decode("#122023"));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 25, 25);
+                g2.dispose();
+            }
+        };
+        viewButton.setFont(new Font("Arial", Font.BOLD, 14));
+        viewButton.setBackground(new Color(76, 175, 80));
+        viewButton.setForeground(Color.WHITE);
+        viewButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        viewButton.setFocusPainted(false);
+        viewButton.setOpaque(false);
+        viewButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                viewButton.setBackground(new Color(56, 142, 60));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                viewButton.setBackground(new Color(76, 175, 80));
+            }
+        });
+        viewButton.addActionListener(e -> {
+            try {
+                Connection conn = JDBC.getConnection();
+                String query = "SELECT * FROM " + getTableName(panelName);
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                java.sql.ResultSet rs = pstmt.executeQuery();
+
+                StringBuilder sb = new StringBuilder();
+                int colCount = rs.getMetaData().getColumnCount();
+
+                while (rs.next()) {
+                    for (int i = 1; i <= colCount; i++) {
+                        sb.append(rs.getMetaData().getColumnName(i)).append(": ").append(rs.getString(i)).append("  ");
+                    }
+                    sb.append("\n");
+                }
+
+                if (sb.length() == 0) {
+                    sb.append("No records found.");
+                }
+
+                JTextArea textArea = new JTextArea(sb.toString());
+                textArea.setEditable(false);
+                textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+                textArea.setCaretPosition(0);
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                scrollPane.setPreferredSize(new Dimension(600, 300));
+
+                JOptionPane.showMessageDialog(null, scrollPane, "All " + panelName + " Data", JOptionPane.INFORMATION_MESSAGE);
+                rs.close();
+                pstmt.close();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Failed to fetch data: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        });
+     buttonPanel.add(viewButton); // ✅ ADD the view button to the panel
+
+
 
         DefaultTableModel tableModel = new DefaultTableModel(tableColumns, 0);
         JTable table = new JTable(tableModel);
@@ -441,6 +546,8 @@ public class LancasterUI extends JFrame {
                 return actionPanel;
             }
         });
+
+
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(Color.decode("#122023"), 1));
         panel.add(scrollPane, BorderLayout.CENTER);
@@ -458,18 +565,85 @@ public class LancasterUI extends JFrame {
                     return;
                 }
             }
-            row[tableColumns.length - 1] = "";
-            tableModel.addRow(row);
-            for (Component input : inputs) {
-                if (input instanceof JTextField) {
-                    ((JTextField) input).setText("");
-                } else if (input instanceof JTextArea) {
-                    ((JTextArea) input).setText("");
+            row[tableColumns.length - 1] = ""; // Actions column
+
+            // Add to database
+            try {
+                Connection conn = JDBC.getConnection();
+                String insertQuery = getInsertQuery(panelName, tableColumns);
+                PreparedStatement pstmt = conn.prepareStatement(insertQuery);
+
+                // Set parameters based on panelName
+                for (int i = 0; i < inputs.length; i++) {
+                    pstmt.setString(i + 1, row[i]);
                 }
+
+                int rowsAffected = pstmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    tableModel.addRow(row); // Add to table only if DB insertion succeeds
+                    JOptionPane.showMessageDialog(null, panelName + " added successfully!");
+                    for (Component input : inputs) {
+                        if (input instanceof JTextField) {
+                            ((JTextField) input).setText("");
+                        } else if (input instanceof JTextArea) {
+                            ((JTextArea) input).setText("");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Failed to add " + panelName + " to database.");
+                }
+
+                pstmt.close();
+                // No need to close connection since JDBC class manages it
+            } catch (SQLException | ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
+                ex.printStackTrace();
             }
         });
 
         return panel;
+    }
+    private String getTableName(String panelName) {
+        switch (panelName.trim().toLowerCase()) {
+            case "show": return "Shows";
+            case "screening": return "Screening";
+            case "film": return "Film";
+            case "meeting": return "Meeting";
+            case "client": return "Client";
+            case "invoice": return "Invoice";
+            case "group sale": return "GroupSale";
+            case "group": return "`Group`";
+            case "fol": return "friends_of_lancaster"; // Or whatever you use
+            case "held/seats": return "HeldSeats";
+            case "ticket sales": return "TicketSales";
+            case "film orders": return "FilmOrder";
+            default: throw new IllegalArgumentException("Unknown panel name: " + panelName);
+        }
+    }
+
+    // Helper method to generate INSERT query based on panel name
+    private String getInsertQuery(String panelName, String[] tableColumns) {
+        String tableName = getTableName(panelName);
+        StringBuilder columns = new StringBuilder();
+        StringBuilder placeholders = new StringBuilder();
+
+        for (int i = 0; i < tableColumns.length - 1; i++) { // Skip "Actions" column
+            String col = tableColumns[i]
+                    .trim()
+                    .replace(" ", "")
+                    .replace("/", "")
+                    .replaceAll("[^a-zA-Z0-9_]", ""); // Clean column names
+
+            columns.append(col);
+            placeholders.append("?");
+
+            if (i < tableColumns.length - 2) {
+                columns.append(", ");
+                placeholders.append(", ");
+            }
+        }
+
+        return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
     }
 
     private void styleTable(JTable table) {
@@ -540,7 +714,9 @@ public class LancasterUI extends JFrame {
                 g2d.dispose();
             }
         }
+
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LancasterUI());
