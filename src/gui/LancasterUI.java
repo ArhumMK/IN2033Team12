@@ -46,7 +46,7 @@ public class LancasterUI extends JFrame {
         sidebarPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         String[] services = { "Home", "Show", "Screening", "Film", "Meeting", "Client", "Invoice",
-                "Group Sale", "Group", "FoL", "Held/Seats", "Ticket Sales", "Film Orders" };
+                "Group Sale", "Group", "Held/Seats", "Ticket Sales", "Film Orders" };
 
         for (String service : services) {
             // Custom button with underline effect
@@ -504,48 +504,11 @@ public class LancasterUI extends JFrame {
 
 
         DefaultTableModel tableModel = new DefaultTableModel(tableColumns, 0);
+        loadTableData(tableModel, panelName, tableColumns);
+
         JTable table = new JTable(tableModel);
         styleTable(table);
-        table.getColumnModel().getColumn(tableColumns.length - 1).setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-                actionPanel.setOpaque(false);
-
-                JButton editButton = new JButton("Edit");
-                editButton.setFont(new Font("Arial", Font.PLAIN, 12));
-                editButton.setBackground(new Color(255, 193, 7));
-                editButton.setForeground(Color.WHITE);
-                editButton.setFocusPainted(false);
-                editButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-                JButton deleteButton = new JButton("Delete");
-                deleteButton.setFont(new Font("Arial", Font.PLAIN, 12));
-                deleteButton.setBackground(new Color(220, 53, 69));
-                deleteButton.setForeground(Color.WHITE);
-                deleteButton.setFocusPainted(false);
-                deleteButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-                actionPanel.add(editButton);
-                actionPanel.add(deleteButton);
-
-                editButton.addActionListener(e -> {
-                    for (int i = 0; i < inputs.length; i++) {
-                        String cellValue = table.getValueAt(row, i).toString();
-                        if (inputs[i] instanceof JTextField) {
-                            ((JTextField) inputs[i]).setText(cellValue);
-                        } else if (inputs[i] instanceof JTextArea) {
-                            ((JTextArea) inputs[i]).setText(cellValue);
-                        }
-                    }
-                    tableModel.removeRow(row);
-                });
-
-                deleteButton.addActionListener(e -> tableModel.removeRow(row));
-
-                return actionPanel;
-            }
-        });
+       
 
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -569,7 +532,7 @@ public class LancasterUI extends JFrame {
 
             // Add to database
             try {
-                Connection conn = JDBC.getConnection();
+                Connection conn = JDBC.getConnection(); // ✅ this is your DB connection
                 String insertQuery = getInsertQuery(panelName, tableColumns);
                 PreparedStatement pstmt = conn.prepareStatement(insertQuery);
 
@@ -580,7 +543,9 @@ public class LancasterUI extends JFrame {
 
                 int rowsAffected = pstmt.executeUpdate();
                 if (rowsAffected > 0) {
-                    tableModel.addRow(row); // Add to table only if DB insertion succeeds
+                    // ✅ Refresh the table right after successful DB insert
+                    loadTableData(tableModel, panelName, tableColumns);
+
                     JOptionPane.showMessageDialog(null, panelName + " added successfully!");
                     for (Component input : inputs) {
                         if (input instanceof JTextField) {
@@ -594,12 +559,12 @@ public class LancasterUI extends JFrame {
                 }
 
                 pstmt.close();
-                // No need to close connection since JDBC class manages it
             } catch (SQLException | ClassNotFoundException ex) {
                 JOptionPane.showMessageDialog(null, "Database error: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
+
 
         return panel;
     }
@@ -613,7 +578,7 @@ public class LancasterUI extends JFrame {
             case "invoice": return "Invoice";
             case "group sale": return "GroupSale";
             case "group": return "`Group`";
-            case "fol": return "friends_of_lancaster"; // Or whatever you use
+            //case "fol": return "friends_of_lancaster"; // Or whatever you use
             case "held/seats": return "HeldSeats";
             case "ticket sales": return "TicketSales";
             case "film orders": return "FilmOrder";
@@ -683,6 +648,36 @@ public class LancasterUI extends JFrame {
             table.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
     }
+    private void loadTableData(DefaultTableModel model, String panelName, String[] tableColumns) {
+        // Skip loading for problematic panels
+        if (panelName.equalsIgnoreCase("GroupSale") || panelName.equalsIgnoreCase("TicketSales") || panelName.equalsIgnoreCase("FoL")) {
+            return;
+        }
+
+        try {
+            model.setRowCount(0); // Clear current rows
+            Connection conn = JDBC.getConnection();
+            String query = "SELECT * FROM " + getTableName(panelName);
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String[] rowData = new String[tableColumns.length];
+                for (int i = 0; i < tableColumns.length - 1; i++) { // skip 'Actions' column
+                    rowData[i] = rs.getString(i + 1);
+                }
+                rowData[tableColumns.length - 1] = ""; // Placeholder for actions column
+                model.addRow(rowData);
+            }
+
+            rs.close();
+            pstmt.close();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "Failed to load table data: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
 
 
     private static class UnderlineButton extends JButton {
