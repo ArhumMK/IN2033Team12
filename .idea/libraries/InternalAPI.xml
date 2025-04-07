@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="InternalAPI">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/InternalAPI.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
