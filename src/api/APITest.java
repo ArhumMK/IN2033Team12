@@ -3,7 +3,44 @@ package api;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * A test class for verifying the functionality of the {@link api.MarketingInterface} API.
+ *
+ * <p>This class contains a main method that executes a series of test cases against
+ * the marketing data API, demonstrating various operations including:
+ * <ul>
+ *   <li>Retrieving client details
+ *   <li>Fetching show ticket prices and discounts
+ *   <li>Getting film information
+ *   <li>Querying film screening schedules
+ *   <li>Checking room usage details
+ * </ul>
+ *
+ * <p>Each test case prints its results to standard output and handles any exceptions
+ * that may occur during execution. The database connection is properly closed in the
+ * finally block.
+ */
 public class APITest {
+    /**
+     * Main entry point for executing the API test cases.
+     *
+     * <p>This method performs the following test sequence:
+     * <ol>
+     *   <li>Retrieves client details for ClientID 1
+     *   <li>Gets ticket price and discount for ShowID 15
+     *   <li>Fetches film details for "The Space Odyssey"
+     *   <li>Queries film screenings between April 1-30, 2025
+     *   <li>Retrieves room usage details for the same period
+     * </ol>
+     *
+     * <p>All database operations use the MarketingData implementation
+     * of the MarketingInterface. The database connection is automatically
+     * closed when tests complete or if an exception occurs.
+     *
+     * @param args command line arguments (not used)
+     *
+     * @throws Exception if any database operation fails during testing
+     */
     public static void main(String[] args) {
         MarketingInterface marketing = new MarketingData();
 

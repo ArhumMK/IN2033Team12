@@ -1,7 +1,6 @@
 package gui;
 
 import api.JDBC;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -13,13 +12,49 @@ import java.awt.geom.GeneralPath;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+/**
+ * The main application window for Lancaster Music Hall cinerma management system.
+ *
+ * <p>The class provides a graphical user interface for managing many aspects
+ * of cinema operations including shows, screenings, films, clients, meetings,
+ * invoices, and seat reservations. The UI features a sidebar navigation system
+ * and card-based content panels for different management functions.
+ *
+ * <p> The interface is build using Swing components and follows a modern design with
+ * dark theme and accent colors. It connects to a database backend through
+ * the JDBC class for constant data storage
+ *
+ * @see javax.swing.JFrame
+ * @see java.awt.CardLayout
+ */
 public class LancasterUI extends JFrame {
 
+    /** Panel containing the sidebar navigation button
+     * Uses a vertical BoxLayout and has a green background
+     * */
     private JPanel sidebarPanel;
+
+    /** Main content panel using CardLayout to switch between views */
     private JPanel mainPanel;
+
+    /** Layout manager for the main panel to handle view switching */
     private CardLayout cardLayout;
 
-    public LancasterUI() {
+
+    /**
+     * Constructs the LancasterUI frame and initializes all components.
+     *
+     * <p>This constructor:
+     * <ul>
+     *   <li>Sets up the window title, size and default close operation
+     *   <li>Initializes the sidebar navigation panel
+     *   <li>Creates the main content panel with CardLayout
+     *   <li>Adds all management panels to the main content area
+     *   <li>Configures the top bar with logo and user information
+     * </ul>
+     */
+     public LancasterUI() {
         setTitle("Cinema Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1280, 720);
@@ -39,6 +74,19 @@ public class LancasterUI extends JFrame {
         setVisible(true);
     }
 
+
+    /**
+     * Initializes and configures the sidebar navigation panel.
+     *
+     * <p>Creates buttons for all management sections with hover effects:
+     * <ul>
+     *   <li>Home, Show, Screening, Film, Meeting
+     *   <li>Client, Invoice, Group, Held/Seats
+     * </ul>
+     *
+     * <p>Each button switches to the corresponding card in the main panel
+     * when clicked. Buttons feature an underline effect on hover.
+     */
     private void setupSidebar() {
         sidebarPanel = new JPanel();
         sidebarPanel.setLayout(new BoxLayout(sidebarPanel, BoxLayout.Y_AXIS));
@@ -93,6 +141,17 @@ public class LancasterUI extends JFrame {
         }
     }
 
+    /**
+     * Creates and configures the top bar with logo and user information.
+     *
+     * <p>The top bar contains:
+     * <ul>
+     *   <li>Application logo on the left
+     *   <li>User information on the right
+     * </ul>
+     *
+     * <p>If the logo image cannot be loaded, a placeholder is displayed.
+     */
     private void setupTopBar() {
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.setBackground(Color.decode("#122023")); // Original color restored
@@ -126,6 +185,25 @@ public class LancasterUI extends JFrame {
         add(topBar, BorderLayout.NORTH);
     }
 
+    /**
+     * Initializes all management panels and adds them to the main panel.
+     *
+     * <p>Creates and configures panels for:
+     * <ul>
+     *   <li>Home - Welcome screen with decorative background
+     *   <li>Show - Show management
+     *   <li>Screening - Screening management
+     *   <li>Film - Film management
+     *   <li>Meeting - Meeting management
+     *   <li>Client - Client management
+     *   <li>Invoice - Invoice management
+     *   <li>Group - Group management
+     *   <li>Held/Seats - Seat reservation management
+     * </ul>
+     *
+     * <p>Each panel is created using {@link #createFormPanel} and added to
+     * the main panel's CardLayout with a corresponding identifier.
+     */
     private void setupMainPanels() {
         // Home Panel with SVG-Inspired Background
         JPanel homePanel = new JPanel(new BorderLayout(10, 10)) {
@@ -311,6 +389,13 @@ public class LancasterUI extends JFrame {
 
     }
 
+    /**
+     * Creates a standardized form panel for data management.
+     *
+     * @param panelName The name of the management section
+     * @param tableColumns The column names for the data table
+     * @return A configured JPanel with form fields and data table
+     */
     private JPanel createFormPanel(String panelName, String[] tableColumns) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(new Color(245, 245, 245));
@@ -568,6 +653,14 @@ public class LancasterUI extends JFrame {
 
         return panel;
     }
+
+    /**
+     * Maps UI panel names to their corresponding database table names.
+     *
+     * @param panelName The name of the UI panel/section
+     * @return The corresponding database table name
+     * @throws IllegalArgumentException if the panel name is unknown
+     */
     private String getTableName(String panelName) {
         switch (panelName.trim().toLowerCase()) {
             case "show": return "Shows";
@@ -586,7 +679,13 @@ public class LancasterUI extends JFrame {
         }
     }
 
-    // Helper method to generate INSERT query based on panel name
+    /**
+     * Generates an SQL INSERT query for the specified panel.
+     *
+     * @param panelName The name of the management section
+     * @param tableColumns The column names for the table
+     * @return A formatted SQL INSERT statement
+     */
     private String getInsertQuery(String panelName, String[] tableColumns) {
         String tableName = getTableName(panelName);
         StringBuilder columns = new StringBuilder();
@@ -611,6 +710,11 @@ public class LancasterUI extends JFrame {
         return String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
     }
 
+    /**
+     * Applies standardized styling to a JTable.
+     *
+     * @param table The table to style
+     */
     private void styleTable(JTable table) {
         table.setRowHeight(30);
         table.setShowGrid(false);
@@ -648,6 +752,14 @@ public class LancasterUI extends JFrame {
             table.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
     }
+
+    /**
+     * Loads data from the database into a table model.
+     *
+     * @param model The table model to populate
+     * @param panelName The name of the management section
+     * @param tableColumns The column names for the table
+     */
     private void loadTableData(DefaultTableModel model, String panelName, String[] tableColumns) {
         // Skip loading for problematic panels
         if (panelName.equalsIgnoreCase("GroupSale") || panelName.equalsIgnoreCase("TicketSales") || panelName.equalsIgnoreCase("FoL")) {
@@ -702,8 +814,9 @@ public class LancasterUI extends JFrame {
         }
     }
 
-
-
+    /**
+     * Custom JButton that displays an underline effect when hovered.
+     */
     private static class UnderlineButton extends JButton {
         private boolean isHovered = false;
 
@@ -736,7 +849,11 @@ public class LancasterUI extends JFrame {
 
     }
 
-
+    /**
+     * Main entry point for the LancasterUI application.
+     *
+     * @param args Command line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LancasterUI());
     }
